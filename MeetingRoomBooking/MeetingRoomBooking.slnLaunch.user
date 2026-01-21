@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "MeetingRoomBooking.Client\\MeetingRoomBooking.Client.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

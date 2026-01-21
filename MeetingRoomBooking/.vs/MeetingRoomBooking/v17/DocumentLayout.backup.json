@@ -1,0 +1,147 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|c:\\users\\daysz\\desktop\\booking\\meetingroombooking\\meetingroombooking.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|solutionrelative:meetingroombooking.api\\controllers\\weatherforecastcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|c:\\users\\daysz\\desktop\\booking\\meetingroombooking\\meetingroombooking.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|solutionrelative:meetingroombooking.api\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|c:\\users\\daysz\\desktop\\booking\\meetingroombooking\\meetingroombooking.api\\entity\\booking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|solutionrelative:meetingroombooking.api\\entity\\booking.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|c:\\users\\daysz\\desktop\\booking\\meetingroombooking\\meetingroombooking.api\\entity\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|solutionrelative:meetingroombooking.api\\entity\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|c:\\users\\daysz\\desktop\\booking\\meetingroombooking\\meetingroombooking.api\\entity\\room.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|solutionrelative:meetingroombooking.api\\entity\\room.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|c:\\users\\daysz\\desktop\\booking\\meetingroombooking\\meetingroombooking.api\\context\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|solutionrelative:meetingroombooking.api\\context\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|c:\\users\\daysz\\desktop\\booking\\meetingroombooking\\meetingroombooking.api\\meetingroombooking.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{7093456B-5EAD-438E-B8F6-F49774949992}|MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj|solutionrelative:meetingroombooking.api\\meetingroombooking.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "WeatherForecastController.cs",
+              "DocumentMoniker": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Controllers\\WeatherForecastController.cs",
+              "RelativeDocumentMoniker": "MeetingRoomBooking.Api\\Controllers\\WeatherForecastController.cs",
+              "ToolTip": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Controllers\\WeatherForecastController.cs",
+              "RelativeToolTip": "MeetingRoomBooking.Api\\Controllers\\WeatherForecastController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAowBUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-21T06:11:54.334Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Program.cs",
+              "RelativeDocumentMoniker": "MeetingRoomBooking.Api\\Program.cs",
+              "ToolTip": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Program.cs",
+              "RelativeToolTip": "MeetingRoomBooking.Api\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-21T06:11:11.559Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "user.cs",
+              "DocumentMoniker": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Entity\\user.cs",
+              "RelativeDocumentMoniker": "MeetingRoomBooking.Api\\Entity\\user.cs",
+              "ToolTip": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Entity\\user.cs",
+              "RelativeToolTip": "MeetingRoomBooking.Api\\Entity\\user.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-21T06:10:48.47Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "room.cs",
+              "DocumentMoniker": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Entity\\room.cs",
+              "RelativeDocumentMoniker": "MeetingRoomBooking.Api\\Entity\\room.cs",
+              "ToolTip": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Entity\\room.cs",
+              "RelativeToolTip": "MeetingRoomBooking.Api\\Entity\\room.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-21T06:10:47.9Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "booking.cs",
+              "DocumentMoniker": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Entity\\booking.cs",
+              "RelativeDocumentMoniker": "MeetingRoomBooking.Api\\Entity\\booking.cs",
+              "ToolTip": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Entity\\booking.cs",
+              "RelativeToolTip": "MeetingRoomBooking.Api\\Entity\\booking.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-21T06:10:47.147Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "MeetingRoomBooking.Api",
+              "DocumentMoniker": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj",
+              "RelativeDocumentMoniker": "MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj",
+              "ToolTip": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj",
+              "RelativeToolTip": "MeetingRoomBooking.Api\\MeetingRoomBooking.Api.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-01-21T06:10:35.179Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Context\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "MeetingRoomBooking.Api\\Context\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\DaySz\\Desktop\\Booking\\MeetingRoomBooking\\MeetingRoomBooking.Api\\Context\\AppDbContext.cs",
+              "RelativeToolTip": "MeetingRoomBooking.Api\\Context\\AppDbContext.cs",
+              "ViewState": "AgIAACgAAAAAAAAAAAAuwDYAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-21T06:10:20.761Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

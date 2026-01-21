@@ -1,0 +1,12 @@
+[
+  {
+    "ContainingType": "TestController",
+    "Method": "GetUsers",
+    "RelativePath": "api/test/users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
