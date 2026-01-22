@@ -1,0 +1,48 @@
+﻿@page "/my-bookings"
+
+@using MeetingRoomBooking.Api.Models
+@using MeetingRoomBooking.Client.Providers
+@inject BookingProvider BookingProvider
+
+<h3>การจองของฉัน</h3>
+
+@if (bookings == null)
+{
+    <p>กำลังโหลดข้อมูล...</p>
+}
+else if (!bookings.Any())
+{
+    <p>คุณยังไม่มีการจอง</p>
+}
+else
+{
+    @foreach (var b in bookings)
+    {
+        <div style="border:1px solid #ddd; padding:10px; margin-bottom:10px;">
+            <strong>@b.RoomName</strong><br />
+            📅 @b.StartTime.ToString("dd/MM/yyyy")
+            ⏰ @b.StartTime.ToString("HH:mm") - @b.EndTime.ToString("HH:mm")<br />
+            📝 @b.Title
+            <br />
+            <button @onclick="() => Cancel(b.Id)">ยกเลิก</button>
+        </div>
+    }
+}
+
+@code {
+    private List<BookingDto>? bookings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        bookings = await BookingProvider.GetMyBookingsAsync();
+    }
+
+    private async Task Cancel(int id)
+    {
+        var ok = await BookingProvider.DeleteBookingAsync(id);
+        if (ok)
+        {
+            bookings = bookings!.Where(b => b.Id != id).ToList();
+        }
+    }
+}

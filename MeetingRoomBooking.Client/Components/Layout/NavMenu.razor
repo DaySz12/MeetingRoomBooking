@@ -1,24 +1,124 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">MeetingRoomBooking.Client</a>
-    </div>
-</div>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using MeetingRoomBooking.Client.Auth
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@inject JwtAuthStateProvider AuthProvider
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<AuthorizeView>
+    <Authorized Context="auth">
+        <nav class="sidebar">
+            <h4 class="logo">MRB</h4>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+            <!-- USER MENU -->
+            <ul class="menu">
+                <li @onclick="@(() => Nav.NavigateTo("/rooms"))">
+                    🏢 ห้องประชุม
+                </li>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+                <li @onclick="@(() => Nav.NavigateTo("/my-bookings"))">
+                    📅 การจองของฉัน
+                </li>
+            </ul>
 
+            <!-- ADMIN MENU -->
+            @if (auth.User.IsInRole("ADMIN"))
+            {
+                <div class="divider"></div>
+                <div class="menu-title">Admin</div>
+
+                <ul class="menu">
+                    <li @onclick="@(() => Nav.NavigateTo("/admin/rooms"))">
+                        ⚙️ จัดการห้อง
+                    </li>
+
+                    <li @onclick="@(() => Nav.NavigateTo("/admin/bookings"))">
+                        📊 การจองทั้งหมด
+                    </li>
+                </ul>
+            }
+
+            <div class="divider"></div>
+
+            <ul class="menu">
+                <li class="logout" @onclick="Logout">
+                    🚪 Logout
+                </li>
+            </ul>
+        </nav>
+    </Authorized>
+
+    <NotAuthorized>
+        <nav class="sidebar">
+            <ul class="menu">
+                <li @onclick="@(() => Nav.NavigateTo("/login"))">
+                    🔐 Login
+                </li>
+            </ul>
+        </nav>
+    </NotAuthorized>
+</AuthorizeView>
+
+<style>
+    .sidebar {
+        width: 220px;
+        background: #1f2937;
+        color: #fff;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .logo {
+        margin-bottom: 30px;
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .menu li {
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+            .menu li:hover {
+                background: #374151;
+            }
+
+    .menu-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        opacity: 0.7;
+        margin: 10px 0;
+    }
+
+    .divider {
+        height: 1px;
+        background: rgba(255,255,255,0.1);
+        margin: 12px 0;
+    }
+
+    .logout {
+        color: #f87171;
+    }
+
+        .logout:hover {
+            background: rgba(248,113,113,0.2);
+        }
+</style>
+
+@code {
+    private async Task Logout()
+    {
+        await JS.InvokeVoidAsync("localStorage.removeItem", "token");
+        AuthProvider.MarkUserAsLoggedOut();
+        Nav.NavigateTo("/login", forceLoad: true);
+    }
+}

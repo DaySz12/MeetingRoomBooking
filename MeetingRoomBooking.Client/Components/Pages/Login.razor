@@ -1,0 +1,230 @@
+﻿@page "/"
+@page "/login"
+@using MeetingRoomBooking.Api.Models
+@using MeetingRoomBooking.Client.Providers
+@using MeetingRoomBooking.Client.Auth
+@inject JwtAuthStateProvider AuthState
+
+@inject AuthProvider AuthProvider
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .login-wrapper {
+        min-height: 100vh;
+        background: #eef2f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-box {
+        width: 900px;
+        height: 480px;
+        background: #fff;
+        border-radius: 18px;
+        display: flex;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    /* LEFT */
+    .login-left {
+        width: 45%;
+        background: linear-gradient(135deg, #4facfe, #00c6fb);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .brand {
+        text-align: center;
+    }
+
+    .logo {
+        font-size: 56px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .brand h4 {
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .brand p {
+        opacity: 0.85;
+        font-size: 14px;
+    }
+
+    /* RIGHT */
+    .login-right {
+        width: 55%;
+        padding: 3rem;
+    }
+
+        .login-right h3 {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+    .subtitle {
+        color: #777;
+        margin-bottom: 2rem;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 44px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 0 12px;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 2px rgba(79,172,254,.2);
+        }
+
+    .btn-login {
+        width: 100%;
+        height: 46px;
+        border-radius: 8px;
+        border: none;
+        background: #4facfe;
+        color: white;
+        font-weight: 500;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+        .btn-login:hover {
+            background: #3b97e0;
+        }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .link {
+        color: #4facfe;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .error {
+        color: #d9534f;
+        margin-top: 10px;
+        text-align: center;
+        font-size: 14px;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-box">
+        <div class="login-left">
+            <div class="brand">
+                <div class="logo">MRB</div>
+                <h4>Meeting Room</h4>
+                <p>Booking System</p>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <h3>Welcome</h3>
+            <div class="subtitle">
+                Login to your account to continue
+            </div>
+
+            <EditForm Model="loginRequest" OnValidSubmit="OnLogin" FormName="LoginForm">
+
+           
+
+                <InputText class="form-control"
+                           placeholder="Username"
+                           @bind-Value="loginRequest.Username" />
+
+                <InputText type="password"
+                           class="form-control"
+                           placeholder="Password"
+                           @bind-Value="loginRequest.Password" />
+
+                <button type="submit" class="btn-login" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span>Loading...</span>
+                    }
+                    else
+                    {
+                        <span>LOGIN</span>
+                    }
+                </button>
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="error">
+                    @errorMessage
+                </div>
+            }
+
+            <div class="text-center" style="margin-top:20px;">
+                <small>
+                    Don’t have an account?
+                    <a class="link" href="/register">Sign Up</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginRequest loginRequest = new();
+    private string? errorMessage;
+    private bool isLoading = false;
+
+    private async Task OnLogin()
+    {
+        // ... (ส่วน Login เหมือนเดิม) ...
+
+        var result = await AuthProvider.LoginAsync(loginRequest);
+
+        if (result == null || string.IsNullOrEmpty(result.Token))
+        {
+            errorMessage = "Username หรือ Password ไม่ถูกต้อง";
+            isLoading = false;
+            return;
+        }
+
+      
+    
+        AuthState.MarkUserAsAuthenticated(result.Token);
+
+        await JS.InvokeVoidAsync("localStorage.setItem", "token", result.Token);
+
+       
+        if (string.Equals(result.Role, "ADMIN", StringComparison.OrdinalIgnoreCase))
+        {
+            Nav.NavigateTo("/admin/rooms");
+        }
+        else
+        {
+            Nav.NavigateTo("/rooms");
+        }
+    }
+
+    
+}
+       

@@ -1,0 +1,160 @@
+﻿@page "/admin/rooms"
+@attribute [Authorize(Roles = "ADMIN")]
+
+@using MeetingRoomBooking.Api.Models
+@using MeetingRoomBooking.Client.Providers
+@using Microsoft.AspNetCore.Authorization
+@inject AdminRoomProvider Provider
+
+<h3>จัดการห้องประชุม (Admin)</h3>
+
+<button class="btn btn-primary mb-3"
+        @onclick="NewRoom">
+    ➕ เพิ่มห้อง
+</button>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ชื่อห้อง</th>
+            <th>ความจุ</th>
+            <th>อุปกรณ์</th>
+            <th style="width:160px"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in rooms)
+        {
+            <tr>
+                <td>@r.name</td>
+                <td>@r.capacity</td>
+                <td>@r.equipment</td>
+                <td>
+                    <button class="btn btn-sm btn-warning"
+                            @onclick="() => Edit(r)">
+                        แก้ไข
+                    </button>
+
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="() => Delete(r.id)">
+                        ลบ
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (showForm)
+{
+    <div class="card p-3 mt-3">
+        <h5>@(isEdit ? "แก้ไขห้อง" : "เพิ่มห้อง")</h5>
+
+        <input class="form-control mb-2"
+               placeholder="ชื่อห้อง"
+               @bind="form.name" />
+
+        <input type="number"
+               class="form-control mb-2"
+               placeholder="ความจุ"
+               @bind="form.capacity" />
+
+        <input class="form-control mb-2"
+               placeholder="อุปกรณ์"
+               @bind="form.equipment" />
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <div class="text-danger mb-2">@error</div>
+        }
+
+        <button class="btn btn-success"
+                @onclick="Save">
+            บันทึก
+        </button>
+
+        <button class="btn btn-secondary ms-2"
+                @onclick="Cancel">
+            ยกเลิก
+        </button>
+    </div>
+}
+
+@code {
+    private List<room> rooms = new();
+
+    private room form = new();
+    private bool showForm = false;
+    private bool isEdit = false;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rooms = await Provider.GetRoomsAsync();
+    }
+
+    private void NewRoom()
+    {
+        form = new room();
+        isEdit = false;
+        showForm = true;
+        error = null;
+    }
+
+    private void Edit(room r)
+    {
+        form = new room
+        {
+            id = r.id,
+            name = r.name,
+            capacity = r.capacity,
+            equipment = r.equipment
+        };
+
+        isEdit = true;
+        showForm = true;
+        error = null;
+    }
+
+    private async Task Save()
+    {
+        error = null;
+
+        if (string.IsNullOrWhiteSpace(form.name))
+        {
+            error = "กรุณาระบุชื่อห้อง";
+            return;
+        }
+
+        bool ok = isEdit
+            ? await Provider.UpdateAsync(form)
+            : await Provider.CreateAsync(form);
+
+        if (!ok)
+        {
+            error = "บันทึกไม่สำเร็จ (อาจชื่อซ้ำ)";
+            return;
+        }
+
+        rooms = await Provider.GetRoomsAsync();
+        showForm = false;
+    }
+
+    private async Task Delete(int id)
+    {
+        var result = await Provider.DeleteAsync(id);
+        if (!result.success)
+        {
+            error = result.error;
+            return;
+        }
+
+        rooms = rooms.Where(r => r.id != id).ToList();
+    }
+
+    private void Cancel()
+    {
+        showForm = false;
+        error = null;
+    }
+}

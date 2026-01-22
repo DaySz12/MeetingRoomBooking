@@ -1,0 +1,208 @@
+﻿@page "/register"
+@using Microsoft.AspNetCore.Components.Web
+@rendermode RenderMode.InteractiveServer
+
+@using MeetingRoomBooking.Api.Models
+@using MeetingRoomBooking.Client.Providers
+
+
+@inject AuthProvider AuthProvider
+@inject NavigationManager Nav
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .login-wrapper {
+        min-height: 100vh;
+        background: #eef2f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-box {
+        width: 100%;
+        max-width: 900px;
+        height: 520px;
+        background: #fff;
+        border-radius: 18px;
+        display: flex;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        margin: 20px;
+    }
+
+    .login-left {
+        width: 45%;
+        background: linear-gradient(135deg, #4facfe, #00c6fb);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .brand {
+        text-align: center;
+    }
+
+    .logo {
+        font-size: 56px;
+        font-weight: 700;
+    }
+
+    .login-right {
+        width: 55%;
+        padding: 3rem;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 44px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 0 12px;
+        margin-bottom: 15px;
+    }
+
+    .btn-login {
+        width: 100%;
+        height: 46px;
+        border-radius: 8px;
+        border: none;
+        background: #4facfe;
+        color: white;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .link {
+        color: #4facfe;
+        cursor: pointer;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-box">
+
+        <div class="login-left">
+            <div class="brand">
+                <div class="logo">MRB</div>
+                <p>Meeting Room Booking</p>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <h3>Create Account</h3>
+            <p style="color:#777; margin-bottom: 20px;">Register to use the system</p>
+
+            <EditForm Model="model" OnValidSubmit="OnRegister" FormName="RegisterForm">
+                <DataAnnotationsValidator />
+
+                <InputText class="form-control"
+                           placeholder="Username"
+                           @bind-Value="model.Username" />
+
+                <InputText type="password"
+                           class="form-control"
+                           placeholder="Password"
+                           @bind-Value="model.Password" />
+
+                <InputText type="password"
+                           class="form-control"
+                           placeholder="Confirm Password"
+                           @bind-Value="confirmPassword" />
+
+                <button type="submit" class="btn-login" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span>Processing...</span>
+                    }
+                    else
+                    {
+                        <span>REGISTER</span>
+                    }
+                </button>
+            </EditForm>
+
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="error-msg">@error</div>
+            }
+
+            @if (success)
+            {
+                <div class="success-msg">สมัครสมาชิกสำเร็จ! กำลังนำทางไปหน้า Login...</div>
+            }
+
+            <div style="margin-top:20px; text-align:center;">
+                Already have an account?
+                <a class="link" href="/login">Login</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private RegisterRequest model = new();
+
+    // confirmPassword แยกออกมาเพราะมักจะไม่ได้อยู่ใน Model ที่ส่งไป API
+    private string? confirmPassword;
+
+    private string? error;
+    private bool success;
+    private bool isLoading;
+
+    private async Task OnRegister()
+        {
+        Console.WriteLine($"Username: '{model.Username}'");
+        Console.WriteLine($"Password: '{model.Password}'");
+        error = null;
+        success = false;
+
+        // Validation เบื้องต้น
+        if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
+        {
+            error = "กรุณากรอกข้อมูลให้ครบถ้วน";
+            return;
+        }
+
+        if (model.Password != confirmPassword)
+        {
+            error = "Password ไม่ตรงกัน";
+            return;
+        }
+
+        isLoading = true;
+
+        try
+        {
+            // จำลองความหน่วงนิดหน่อยให้ UX ดูสมจริง (ลบออกได้)
+            // await Task.Delay(500);
+
+            var ok = await AuthProvider.RegisterAsync(model);
+
+            if (!ok)
+            {
+                error = "สมัครสมาชิกไม่สำเร็จ (Username อาจซ้ำ)";
+                isLoading = false;
+                return;
+            }
+
+            success = true;
+            isLoading = false;
+            StateHasChanged(); // สั่งอัปเดตหน้าจอทันทีเพื่อโชว์ข้อความ Success
+
+            await Task.Delay(1500); // รอให้คนอ่านข้อความแป๊บนึง
+            Nav.NavigateTo("/login");
+        }
+        catch (Exception ex)
+        {
+            error = "เกิดข้อผิดพลาด: " + ex.Message;
+            isLoading = false;
+        }
+    }
+}

@@ -1,0 +1,335 @@
+﻿@page "/rooms"
+@using Microsoft.AspNetCore.Authorization
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using MeetingRoomBooking.Api.Models
+@using MeetingRoomBooking.Client.Providers
+
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+
+@inject BookingProvider _bookingProvider
+@inject RoomProvider _roomProvider
+
+<style>
+    /* --- CSS (เหมือนเดิม) --- */
+    .dashboard-container {
+        padding: 20px;
+        background-color: #f4f6f9;
+        min-height: 100vh;
+        font-family: 'Sarabun', sans-serif;
+    }
+
+    .page-header {
+        background-color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        border-left: 5px solid #007bff;
+    }
+
+    .room-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+    }
+
+    .room-box {
+        height: 140px;
+        border-radius: 8px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        position: relative;
+        text-align: center;
+        padding: 10px;
+    }
+
+        .room-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+    .status-available {
+        background-color: #28a745;
+    }
+
+    .status-occupied {
+        background-color: #ffc107;
+        color: #333;
+        cursor: not-allowed;
+        opacity: 0.9;
+    }
+
+    .room-name {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .room-info {
+        font-size: 13px;
+        opacity: 0.95;
+        margin-bottom: 2px;
+    }
+
+    /* Modal CSS */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        width: 500px;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #999;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #555;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+        .btn-submit:disabled {
+            background: #ccc;
+        }
+</style>
+
+<div class="dashboard-container">
+    <div class="page-header">
+        <h4 style="margin:0">รายการห้องประชุม (Room Status)</h4>
+    </div>
+
+    <div class="room-grid">
+        @foreach (var item in roomList)
+        {
+            <div class="room-box @(item.IsAvailable ? "status-available" : "status-occupied")"
+                 @onclick="() => OpenBookingModal(item)">
+
+                <div class="room-name">@item.Room.Name</div>
+                <div class="room-info">👥 @item.Room.Capacity คน</div>
+                <div class="room-info">💻 @(string.IsNullOrEmpty(item.Room.Equipment) ? "-" : item.Room.Equipment)</div>
+
+                <div style="margin-top:5px; font-weight:bold; font-size:12px; background:rgba(0,0,0,0.1); padding:2px 8px; border-radius:10px;">
+                    @(item.IsAvailable ? "✨ ว่าง" : "⛔ ไม่ว่าง")
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@if (showModal && selectedItem != null)
+{
+    <div class="modal-overlay" @onclick="CloseModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <div class="modal-title">จองห้อง: @selectedItem.Room.Name</div>
+                <button class="close-btn" @onclick="CloseModal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">หัวข้อการประชุม</label>
+                    <input class="form-control" @bind="bookingModel.Title" placeholder="ระบุหัวข้อ..." />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">วันที่</label>
+                    <input type="date" class="form-control" @bind="bookingDate" />
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1">
+                        <label class="form-label">เริ่มเวลา</label>
+                        <input type="time" class="form-control" @bind="startTime" />
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label class="form-label">ถึงเวลา</label>
+                        <input type="time" class="form-control" @bind="endTime" />
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(errorMsg))
+                {
+                    <div style="color:red; margin-bottom:10px;">@errorMsg</div>
+                }
+
+                @if (isSuccess)
+                {
+                    <div style="color:green; margin-bottom:10px;">🎉 จองสำเร็จ!</div>
+                }
+
+                <button class="btn-submit" @onclick="ConfirmBooking" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span>บันทึกข้อมูล...</span>
+                    }
+                    else
+                    {
+
+                        <span>ยืนยันการจอง</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public class RoomUiItem
+    {
+        public RoomModel Room { get; set; } = new();
+        public bool IsAvailable { get; set; } = true;
+    }
+
+    private List<RoomUiItem> roomList = new();
+    private bool showModal = false;
+    private RoomUiItem? selectedItem;
+
+    private CreateBookingDto bookingModel = new();
+    private DateTime bookingDate = DateTime.Today;
+    private TimeOnly? startTime;
+    private TimeOnly? endTime;
+
+    private bool isLoading = false;
+    private bool isSuccess = false;
+    private string? errorMsg;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // ใช้ _roomProvider แทน RoomProvider เพื่อแก้ Error
+            var roomsFromDb = await _roomProvider.GetRoomsAsync();
+
+            roomList = roomsFromDb.Select(r => new RoomUiItem
+            {
+                Room = r,
+                IsAvailable = true
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // ✅ เพิ่ม Method ที่เคยหายไปกลับมาให้แล้วครับ
+    private void OpenBookingModal(RoomUiItem item)
+    {
+        if (!item.IsAvailable) return;
+
+        selectedItem = item;
+        showModal = true;
+
+        bookingModel = new CreateBookingDto { RoomId = item.Room.Id };
+        bookingDate = DateTime.Today;
+        startTime = null;
+        endTime = null;
+        errorMsg = null;
+        isSuccess = false;
+    }
+
+    private void CloseModal() => showModal = false;
+
+    private async Task ConfirmBooking()
+    {
+        errorMsg = null;
+
+        if (string.IsNullOrWhiteSpace(bookingModel.Title)) { errorMsg = "กรุณาระบุหัวข้อ"; return; }
+        if (startTime == null || endTime == null) { errorMsg = "กรุณาระบุเวลา"; return; }
+
+        bookingModel.StartTime = bookingDate.Date.Add(startTime.Value.ToTimeSpan());
+        bookingModel.EndTime = bookingDate.Date.Add(endTime.Value.ToTimeSpan());
+
+        if (bookingModel.StartTime >= bookingModel.EndTime) { errorMsg = "เวลาไม่ถูกต้อง"; return; }
+
+        isLoading = true;
+        try
+        {
+            // ใช้ _bookingProvider แทน BookingProvider
+            var success = await _bookingProvider.CreateBookingAsync(bookingModel);
+            if (success)
+            {
+                isSuccess = true;
+                StateHasChanged();
+                await Task.Delay(1500);
+                CloseModal();
+            }
+            else
+            {
+                errorMsg = "จองไม่สำเร็จ (ห้องอาจจะไม่ว่าง)";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMsg = "Error: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}
