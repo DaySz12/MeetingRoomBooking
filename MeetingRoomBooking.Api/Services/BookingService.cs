@@ -15,36 +15,52 @@ public class BookingService : IBookingService
     // 🔹 จองห้อง
     public async Task CreateAsync(CreateBookingDto dto)
     {
-        if (dto.StartTime >= dto.EndTime)
-            throw new Exception("เวลาเริ่มต้องน้อยกว่าเวลาจบ");
-
-        var isOverlap = await _context.bookings
-            .AnyAsync(b =>
-                b.room_id == dto.RoomId &&
-                dto.StartTime < b.end_time &&
-                dto.EndTime > b.start_time
-            );
-
-        if (isOverlap)
-            throw new Exception("ช่วงเวลานี้มีการจองแล้ว");
-
-        var booking = new booking
+        try
         {
-            room_id = dto.RoomId,
-            user_id = dto.UserId,
-            start_time = dto.StartTime,
-            end_time = dto.EndTime,
-            title = dto.Title,
-            note = dto.Note
-        };
+            if (dto.StartTime >= dto.EndTime)
+                throw new InvalidOperationException("เวลาเริ่มต้องน้อยกว่าเวลาจบ");
 
-        await _context.bookings.AddAsync(booking);
-        await _context.SaveChangesAsync();
+            var isOverlap = await _context.bookings
+                .AnyAsync(b =>
+                    b.room_id == dto.RoomId &&
+                    dto.StartTime < b.end_time &&
+                    dto.EndTime > b.start_time
+                );
+
+            if (isOverlap)
+                throw new InvalidOperationException("ช่วงเวลานี้มีการจองแล้ว");
+
+            var booking = new booking
+            {
+                room_id = dto.RoomId,
+                user_id = dto.UserId,
+                start_time = dto.StartTime,
+                end_time = dto.EndTime,
+                title = dto.Title,
+                note = dto.Note
+            };
+
+            await _context.bookings.AddAsync(booking);
+            await _context.SaveChangesAsync();
+        }
+        catch (InvalidOperationException)
+        {
+            
+            throw;
+        }
+        catch (Exception ex)
+        {
+           
+            throw new Exception("เกิดข้อผิดพลาดในการสร้างการจอง", ex);
+        }
     }
+
 
     // 🔹 แก้ไขการจอง (เฉพาะของตัวเอง)
     public async Task UpdateAsync(int bookingId, int userId, UpdateBookingDto dto)
     {
+        try { 
+
         if (dto.StartTime >= dto.EndTime)
             throw new Exception("เวลาเริ่มต้องน้อยกว่าเวลาจบ");
 
@@ -72,10 +88,22 @@ public class BookingService : IBookingService
 
         await _context.SaveChangesAsync();
     }
+    catch (InvalidOperationException)
+        {
+            
+            throw;
+        }
+        catch (Exception ex)
+        {
+           
+            throw new Exception("เกิดข้อผิดพลาด", ex);
+        }
+    }
 
     // 🔹 ยกเลิกการจอง (เฉพาะของตัวเอง)
     public async Task DeleteAsync(int bookingId, int userId)
     {
+        try { 
         var booking = await _context.bookings
             .FirstOrDefaultAsync(b => b.id == bookingId && b.user_id == userId);
 
@@ -85,10 +113,22 @@ public class BookingService : IBookingService
         _context.bookings.Remove(booking);
         await _context.SaveChangesAsync();
     }
+        catch (InvalidOperationException)
+        {
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception("เกิดข้อผิดพลาด", ex);
+        }
+    }
 
     // 🔹 ดูการจองของฉัน
     public async Task<List<BookingDto>> GetMybookingsAsync(int userId)
     {
+        try { 
         return await _context.bookings
             .Where(b => b.user_id == userId)
             .OrderByDescending(b => b.start_time)
@@ -101,5 +141,16 @@ public class BookingService : IBookingService
                 Title = b.title
             })
             .ToListAsync();
+    }
+        catch (InvalidOperationException)
+        {
+
+            throw;
+        }   
+        catch (Exception ex)
+        {
+
+            throw new Exception("เกิดข้อผิดพลาด", ex);
+        }
     }
 }

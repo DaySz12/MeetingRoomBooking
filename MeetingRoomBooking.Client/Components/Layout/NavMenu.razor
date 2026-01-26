@@ -7,51 +7,76 @@
 <AuthorizeView>
     <Authorized Context="auth">
         <nav class="sidebar">
-            <h4 class="logo">MRB</h4>
+            <div class="logo-container">
+         
+                <h4 class="logo">Meeting Room</h4>
+                <p class="logo-subtitle">Booking System</p>
+            </div>
 
-            <!-- USER MENU -->
-            <ul class="menu">
-                <li @onclick="@(() => Nav.NavigateTo("/rooms"))">
-                    🏢 ห้องประชุม
-                </li>
+       @if (auth.User.IsInRole("USER"))
+            {
+                <div class="menu-section">
+                    <div class="menu-title">เมนูหลัก</div>
+                    <ul class="menu">
+                        <li class="menu-item" @onclick="@(() => Nav.NavigateTo("/rooms"))">
+                            <Icon Name="IconName.Building" Class="menu-icon" />
+                            <span class="menu-text">ห้องประชุม</span>
+                        </li>
 
-                <li @onclick="@(() => Nav.NavigateTo("/my-bookings"))">
-                    📅 การจองของฉัน
-                </li>
-            </ul>
+                        <li class="menu-item" @onclick="@(() => Nav.NavigateTo("/my-bookings"))">
+                            <span class="menu-icon"></span>
+                            <span class="menu-text">การจองของฉัน</span>
+                        </li>
+                    </ul>
+                </div>
+            }
 
             <!-- ADMIN MENU -->
             @if (auth.User.IsInRole("ADMIN"))
             {
-                <div class="divider"></div>
-                <div class="menu-title">Admin</div>
-
-                <ul class="menu">
-                    <li @onclick="@(() => Nav.NavigateTo("/admin/rooms"))">
-                        ⚙️ จัดการห้อง
-                    </li>
-
-                    <li @onclick="@(() => Nav.NavigateTo("/admin/bookings"))">
-                        📊 การจองทั้งหมด
-                    </li>
-                </ul>
+                <div class="menu-section">
+                    <div class="menu-title">ผู้ดูแลระบบ</div>
+                    <ul class="menu">
+                        <li class="menu-item" @onclick="@(() => Nav.NavigateTo("/admin/rooms"))">
+                            <span class="menu-icon"></span>
+                            <span class="menu-text">จัดการห้อง</span>
+                        </li>
+                        <li class="menu-item" @onclick="@(() => Nav.NavigateTo("/admin/bookings"))">
+                            <span class="menu-icon"></span>
+                            <span class="menu-text">การจองทั้งหมด</span>
+                        </li>
+                    </ul>
+                </div>
             }
 
-            <div class="divider"></div>
-
-            <ul class="menu">
-                <li class="logout" @onclick="Logout">
-                    🚪 Logout
-                </li>
-            </ul>
+            <!-- USER INFO & LOGOUT -->
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        @(auth.User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "U")
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">@(auth.User.Identity?.Name ?? "User")</div>
+                        <div class="user-role">@(auth.User.IsInRole("ADMIN") ? "Admin" : "User")</div>
+                    </div>
+                </div>
+                <button class="logout-btn" @onclick="Logout">
+                    <span class="menu-icon"></span>
+                    <span class="menu-text">ออกจากระบบ</span>
+                </button>
+            </div>
         </nav>
     </Authorized>
-
     <NotAuthorized>
-        <nav class="sidebar">
+        <nav class="sidebar sidebar-guest">
+            <div class="logo-container">
+                <div class="logo-icon"></div>
+                <h4 class="logo">Meeting Room</h4>
+            </div>
             <ul class="menu">
-                <li @onclick="@(() => Nav.NavigateTo("/login"))">
-                    🔐 Login
+                <li class="menu-item login-item" @onclick="@(() => Nav.NavigateTo("/login"))">
+                    <span class="menu-icon"></span>
+                    <span class="menu-text">เข้าสู่ระบบ</span>
                 </li>
             </ul>
         </nav>
@@ -60,18 +85,88 @@
 
 <style>
     .sidebar {
-        width: 220px;
-        background: #1f2937;
+        width: 260px;
+        background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
         color: #fff;
         min-height: 100vh;
-        padding: 20px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+    .logo-container {
+        padding: 30px 20px;
+        text-align: center;
+        background: rgba(99, 102, 241, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .logo-icon {
+        font-size: 42px;
+        margin-bottom: 10px;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
     }
 
     .logo {
-        margin-bottom: 30px;
-        font-size: 22px;
-        font-weight: bold;
-        text-align: center;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.5px;
+    }
+
+    .logo-subtitle {
+        margin: 5px 0 0 0;
+        font-size: 11px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .menu-section {
+        padding: 20px 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .menu-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: 12px;
+        padding: 0 10px;
+        letter-spacing: 1px;
     }
 
     .menu {
@@ -80,38 +175,198 @@
         margin: 0;
     }
 
-        .menu li {
-            padding: 10px 12px;
-            margin-bottom: 6px;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 14px;
+    .menu-item {
+        padding: 12px 15px;
+        margin-bottom: 6px;
+        cursor: pointer;
+        border-radius: 10px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        font-weight: 500;
+    }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: linear-gradient(180deg, #6366f1 0%, #a78bfa 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s;
         }
 
-            .menu li:hover {
-                background: #374151;
+        .menu-item:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+            .menu-item:hover::before {
+                transform: scaleY(1);
             }
 
-    .menu-title {
-        font-size: 12px;
-        text-transform: uppercase;
-        opacity: 0.7;
-        margin: 10px 0;
-    }
-
-    .divider {
-        height: 1px;
-        background: rgba(255,255,255,0.1);
-        margin: 12px 0;
-    }
-
-    .logout {
-        color: #f87171;
-    }
-
-        .logout:hover {
-            background: rgba(248,113,113,0.2);
+        .menu-item:active {
+            transform: translateX(3px) scale(0.98);
         }
+
+    .menu-icon {
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .menu-text {
+        flex: 1;
+    }
+
+    .login-item {
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+        .login-item:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+            transform: translateX(5px) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+    .sidebar-footer {
+        margin-top: auto;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .user-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 18px;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .user-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-role {
+        font-size: 11px;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .logout-btn {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+        border-radius: 10px;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s;
+        font-weight: 500;
+        font-family: inherit;
+    }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-btn:active {
+            transform: translateY(0);
+        }
+
+    /* Guest Sidebar */
+    .sidebar-guest {
+        justify-content: space-between;
+    }
+
+        .sidebar-guest .menu {
+            padding: 20px 15px;
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .sidebar {
+            width: 80px;
+        }
+
+        .logo-container {
+            padding: 20px 10px;
+        }
+
+        .logo, .logo-subtitle, .menu-title, .menu-text, .user-details {
+            display: none;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+        }
+
+        .menu-item {
+            justify-content: center;
+            padding: 12px 10px;
+        }
+
+        .menu-icon {
+            font-size: 22px;
+        }
+
+        .user-info {
+            justify-content: center;
+        }
+
+        .logout-btn .menu-text {
+            display: none;
+        }
+    }
 </style>
 
 @code {

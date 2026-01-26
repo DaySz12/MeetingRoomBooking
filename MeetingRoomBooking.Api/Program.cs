@@ -21,6 +21,7 @@ builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAdminRoomService, AdminRoomService>();
+builder.Services.AddScoped<IAdminBookingService, AdminBookingService>();
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>

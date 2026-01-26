@@ -163,7 +163,7 @@
         error = null;
         success = false;
 
-        // Validation เบื้องต้น
+   
         if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
         {
             error = "กรุณากรอกข้อมูลให้ครบถ้วน";
@@ -180,9 +180,7 @@
 
         try
         {
-            // จำลองความหน่วงนิดหน่อยให้ UX ดูสมจริง (ลบออกได้)
-            // await Task.Delay(500);
-
+  
             var ok = await AuthProvider.RegisterAsync(model);
 
             if (!ok)
@@ -194,9 +192,9 @@
 
             success = true;
             isLoading = false;
-            StateHasChanged(); // สั่งอัปเดตหน้าจอทันทีเพื่อโชว์ข้อความ Success
+            StateHasChanged(); 
 
-            await Task.Delay(1500); // รอให้คนอ่านข้อความแป๊บนึง
+            await Task.Delay(1500); 
             Nav.NavigateTo("/login");
         }
         catch (Exception ex)

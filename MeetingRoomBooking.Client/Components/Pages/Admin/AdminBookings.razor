@@ -1,0 +1,237 @@
+﻿@page "/admin/bookings"
+@attribute [Authorize(Roles = "ADMIN")]
+@using MeetingRoomBooking.Api.Models
+@using Microsoft.AspNetCore.Authorization
+@inject AdminBookingProvider Provider
+
+<style>
+    .admin-container {
+        padding: 30px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        font-family: 'Sarabun', sans-serif;
+    }
+
+    .page-header {
+        background: white;
+        padding: 25px 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 5px solid #6366f1;
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Summary Cards */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .summary-card {
+        background: white;
+        padding: 22px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .summary-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+        color: white;
+    }
+
+    .summary-title {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
+
+    .summary-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .custom-table thead {
+            background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+            color: white;
+        }
+
+            .custom-table thead th {
+                padding: 16px 20px;
+                text-align: left;
+                font-size: 14px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+        .custom-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: 0.2s;
+        }
+
+            .custom-table tbody tr:hover {
+                background: #f8f9ff;
+            }
+
+        .custom-table tbody td {
+            padding: 18px 20px;
+            font-size: 15px;
+        }
+
+    .btn-delete {
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        transition: 0.2s;
+    }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px;
+        color: #6b7280;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="page-header">
+        <h3 class="page-title">📊 การจองทั้งหมด</h3>
+    </div>
+
+    @if (summary != null)
+    {
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-icon">📅</div>
+                <div>
+                    <div class="summary-title">วันนี้</div>
+                    <div class="summary-value">@summary.TodayBookings</div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon">📚</div>
+                <div>
+                    <div class="summary-title">การจองทั้งหมด</div>
+                    <div class="summary-value">@summary.TotalBookings</div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon">🏢</div>
+                <div>
+                    <div class="summary-title">จำนวนห้อง</div>
+                    <div class="summary-value">@summary.TotalRooms</div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="table-container">
+        @if (bookings == null || bookings.Count == 0)
+        {
+            <div class="empty-state">
+                ยังไม่มีข้อมูลการจอง
+            </div>
+        }
+        else
+        {
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>ห้อง</th>
+                        <th>ผู้จอง</th>
+                        <th>หัวข้อ</th>
+                        <th>เวลา</th>
+                        <th style="width:120px;">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in bookings)
+                    {
+                        <tr>
+                            <td><strong>@b.RoomName</strong></td>
+                            <td>@b.Username</td>
+                            <td>@b.Title</td>
+                            <td>@b.StartTime:g - @b.EndTime:t</td>
+                            <td>
+                                <button class="btn-delete"
+                                        @onclick="() => Delete(b.Id)">
+                                    🗑️ ลบ
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@code {
+    private AdminBookingSummaryDto? summary;
+    private List<AdminBookingDto>? bookings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        summary = await Provider.GetSummaryAsync();
+        bookings = await Provider.GetBookingsAsync();
+    }
+
+    private async Task Delete(int id)
+    {
+        if (await Provider.DeleteAsync(id))
+        {
+            bookings = await Provider.GetBookingsAsync();
+            summary = await Provider.GetSummaryAsync();
+        }
+    }
+}

@@ -14,6 +14,8 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<BookingProvider>();
 builder.Services.AddScoped<RoomProvider>();
+builder.Services.AddScoped<AdminBookingProvider>();
+
 // JWT auth state
 builder.Services.AddScoped<JwtAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(

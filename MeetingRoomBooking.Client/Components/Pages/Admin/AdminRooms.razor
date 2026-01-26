@@ -1,88 +1,448 @@
 ﻿@page "/admin/rooms"
 @attribute [Authorize(Roles = "ADMIN")]
-
 @using MeetingRoomBooking.Api.Models
 @using MeetingRoomBooking.Client.Providers
 @using Microsoft.AspNetCore.Authorization
 @inject AdminRoomProvider Provider
 
-<h3>จัดการห้องประชุม (Admin)</h3>
+<style>
+    .admin-container {
+        padding: 30px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        font-family: 'Sarabun', sans-serif;
+    }
 
-<button class="btn btn-primary mb-3"
-        @onclick="NewRoom">
-    ➕ เพิ่มห้อง
-</button>
+    .page-header {
+        background: white;
+        padding: 25px 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-left: 5px solid #6366f1;
+    }
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ชื่อห้อง</th>
-            <th>ความจุ</th>
-            <th>อุปกรณ์</th>
-            <th style="width:160px"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var r in rooms)
-        {
-            <tr>
-                <td>@r.name</td>
-                <td>@r.capacity</td>
-                <td>@r.equipment</td>
-                <td>
-                    <button class="btn btn-sm btn-warning"
-                            @onclick="() => Edit(r)">
-                        แก้ไข
-                    </button>
+    .page-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
 
-                    <button class="btn btn-sm btn-danger"
-                            @onclick="() => Delete(r.id)">
-                        ลบ
-                    </button>
-                </td>
-            </tr>
+    .btn-add {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
         }
-    </tbody>
-</table>
+
+        .btn-add:active {
+            transform: translateY(0);
+        }
+
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .custom-table thead {
+            background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+            color: white;
+        }
+
+            .custom-table thead th {
+                padding: 16px 20px;
+                text-align: left;
+                font-weight: 600;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+        .custom-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s;
+        }
+
+            .custom-table tbody tr:hover {
+                background: #f8f9ff;
+            }
+
+            .custom-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+        .custom-table tbody td {
+            padding: 18px 20px;
+            font-size: 15px;
+            color: #333;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-icon {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+    }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+        }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+    /* Modal Form */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-content {
+        background: white;
+        width: 90%;
+        max-width: 550px;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        /* animation: slideUp 0.3s ease-out; */
+        overflow: hidden;
+    }
+
+    .modal-header {
+        padding: 25px 30px;
+        background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+        color: white;
+    }
+
+    .modal-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .modal-body {
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.2s;
+        font-family: 'Sarabun', sans-serif;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+    .alert {
+        padding: 12px 16px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-weight: 500;
+        background: #fee;
+        color: #c33;
+        border-left: 4px solid #c33;
+    }
+
+    .modal-footer {
+        display: flex;
+        gap: 12px;
+        padding: 0 30px 30px 30px;
+    }
+
+    .btn-save {
+        flex: 1;
+        padding: 14px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 14px;
+        background: #f3f4f6;
+        color: #6b7280;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .empty-state-text {
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    .room-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: #f0f9ff;
+        color: #0369a1;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="page-header">
+        <h3 class="page-title">⚙️ จัดการห้องประชุม</h3>
+        <button class="btn-add" @onclick="NewRoom">
+            <span>➕</span>
+            <span>เพิ่มห้องใหม่</span>
+        </button>
+    </div>
+
+    <div class="table-container">
+        @if (rooms.Count == 0)
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon"></div>
+                <div class="empty-state-text">ยังไม่มีห้องประชุม</div>
+            </div>
+        }
+        else
+        {
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>ชื่อห้อง</th>
+                        <th>ความจุ</th>
+                        <th>อุปกรณ์</th>
+                        <th style="width:180px; text-align:center;">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in rooms)
+                    {
+                        <tr>
+                            <td><strong>@r.name</strong></td>
+                            <td>
+                                <span class="room-badge">
+                                    <span>👥</span>
+                                    <span>@r.capacity คน</span>
+                                </span>
+                            </td>
+                            <td>@(string.IsNullOrEmpty(r.equipment) ? "-" : r.equipment)</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-edit" @onclick="() => Edit(r)">
+                                        <span>✏️</span>
+                                        <span>แก้ไข</span>
+                                    </button>
+                                    <button class="btn-icon btn-delete" @onclick="() => Delete(r.id)">
+                                        <span>🗑️</span>
+                                        <span>ลบ</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
 
 @if (showForm)
 {
-    <div class="card p-3 mt-3">
-        <h5>@(isEdit ? "แก้ไขห้อง" : "เพิ่มห้อง")</h5>
+    <div class="modal-overlay" @onclick="Cancel">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    @if (isEdit)
+                    {
+                        <span>✏️ แก้ไขห้องประชุม</span>
+                    }
+                    else
+                    {
+                        <span>➕ เพิ่มห้องประชุมใหม่</span>
+                    }
+                </h5>
+            </div>
 
-        <input class="form-control mb-2"
-               placeholder="ชื่อห้อง"
-               @bind="form.name" />
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">🏢 ชื่อห้อง</label>
+                    <input class="form-control"
+                           placeholder="เช่น ห้องประชุมใหญ่"
+                           @bind="form.name" />
+                </div>
 
-        <input type="number"
-               class="form-control mb-2"
-               placeholder="ความจุ"
-               @bind="form.capacity" />
+                <div class="form-group">
+                    <label class="form-label">👥 ความจุ (คน)</label>
+                    <input type="number"
+                           class="form-control"
+                           placeholder="เช่น 20"
+                           @bind="form.capacity" />
+                </div>
 
-        <input class="form-control mb-2"
-               placeholder="อุปกรณ์"
-               @bind="form.equipment" />
+                <div class="form-group">
+                    <label class="form-label">💻 อุปกรณ์</label>
+                    <input class="form-control"
+                           placeholder="เช่น โปรเจคเตอร์, ไวท์บอร์ด"
+                           @bind="form.equipment" />
+                </div>
 
-        @if (!string.IsNullOrEmpty(error))
-        {
-            <div class="text-danger mb-2">@error</div>
-        }
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert">⚠️ @error</div>
+                }
+            </div>
 
-        <button class="btn btn-success"
-                @onclick="Save">
-            บันทึก
-        </button>
-
-        <button class="btn btn-secondary ms-2"
-                @onclick="Cancel">
-            ยกเลิก
-        </button>
+            <div class="modal-footer">
+                <button class="btn-cancel" @onclick="Cancel">
+                    ยกเลิก
+                </button>
+                <button class="btn-save" @onclick="Save">
+                    💾 บันทึก
+                </button>
+            </div>
+        </div>
     </div>
 }
 
 @code {
     private List<room> rooms = new();
-
     private room form = new();
     private bool showForm = false;
     private bool isEdit = false;
@@ -110,7 +470,6 @@
             capacity = r.capacity,
             equipment = r.equipment
         };
-
         isEdit = true;
         showForm = true;
         error = null;
@@ -119,23 +478,19 @@
     private async Task Save()
     {
         error = null;
-
         if (string.IsNullOrWhiteSpace(form.name))
         {
             error = "กรุณาระบุชื่อห้อง";
             return;
         }
-
         bool ok = isEdit
             ? await Provider.UpdateAsync(form)
             : await Provider.CreateAsync(form);
-
         if (!ok)
         {
             error = "บันทึกไม่สำเร็จ (อาจชื่อซ้ำ)";
             return;
         }
-
         rooms = await Provider.GetRoomsAsync();
         showForm = false;
     }
@@ -148,7 +503,6 @@
             error = result.error;
             return;
         }
-
         rooms = rooms.Where(r => r.id != id).ToList();
     }
 
