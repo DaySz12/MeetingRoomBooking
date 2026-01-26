@@ -36,7 +36,7 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        // 🚫 ยัง prerender → ห้ามแตะ JS
+        
         if (!_isInteractive)
         {
             return new AuthenticationState(
@@ -59,7 +59,7 @@ public class JwtAuthStateProvider : AuthenticationStateProvider
         return new AuthenticationState(new ClaimsPrincipal(identity));
     }
 
-    // 👉 เรียกจาก Component หลัง interactive
+
     public void SetInteractive()
     {
         _isInteractive = true;

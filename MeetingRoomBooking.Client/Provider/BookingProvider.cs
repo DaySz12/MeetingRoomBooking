@@ -1,14 +1,14 @@
 ﻿using MeetingRoomBooking.Api.Models;
 using System.Net.Http.Json;
-using System.Net.Http.Headers; // 👈 1. ต้องเพิ่ม
-using Microsoft.JSInterop;     // 👈 2. ต้องเพิ่ม
+using System.Net.Http.Headers; 
+using Microsoft.JSInterop;    
 
 namespace MeetingRoomBooking.Client.Providers
 {
     public class BookingProvider
     {
         private readonly HttpClient _http;
-        private readonly IJSRuntime _js; // 👈 3. เพิ่มตัวช่วยอ่าน LocalStorage
+        private readonly IJSRuntime _js; 
 
         public BookingProvider(HttpClient http, IJSRuntime js)
         {
@@ -16,7 +16,7 @@ namespace MeetingRoomBooking.Client.Providers
             _js = js;
         }
 
-        // 🔹 ฟังก์ชันช่วยแนบ Token (สำคัญมาก ไม่งั้นเจอ 401)
+
         private async Task AddJwtHeader()
         {
             try
@@ -34,7 +34,7 @@ namespace MeetingRoomBooking.Client.Providers
         // ✅ CREATE: จองห้อง
         public async Task<bool> CreateBookingAsync(CreateBookingDto model) // เปลี่ยนชื่อให้ตรงกับที่หน้า UI เรียกใช้
         {
-            await AddJwtHeader(); // 1. แนบ Token
+            await AddJwtHeader(); 
             var res = await _http.PostAsJsonAsync("api/bookings", model);
 
             // 2. ถ้าไม่สำเร็จ (เช่น 400 Bad Request หรือเวลาชน)
@@ -64,14 +64,14 @@ namespace MeetingRoomBooking.Client.Providers
         // ✅ GET MY BOOKINGS: ดึงประวัติ
         public async Task<List<BookingDto>> GetMyBookingsAsync()
         {
-            await AddJwtHeader(); // แนบ Token
+            await AddJwtHeader(); 
             return await _http.GetFromJsonAsync<List<BookingDto>>("api/bookings/my") ?? new();
         }
 
         // ✅ DELETE: ยกเลิกจอง
         public async Task<bool> DeleteBookingAsync(int id)
         {
-            await AddJwtHeader(); // แนบ Token
+            await AddJwtHeader();
             var res = await _http.DeleteAsync($"api/bookings/{id}");
             return res.IsSuccessStatusCode;
         }
